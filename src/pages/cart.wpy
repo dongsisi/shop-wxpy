@@ -1,0 +1,21 @@
+<style lang="less">
+</style>
+<template>
+    <view class="container">购物车</view>
+</template>
+
+<script>
+import wepy from 'wepy'
+
+export default class Index extends wepy.app {
+  config = {
+    navigationBarTitleText: 'cart',
+    navigationBarBackgroundColor: '#ff2d4a',
+    navigationBarTextStyle: 'white'
+  };
+
+  onLoad() {
+    console.log('onLoad')
+  }
+}
+</script>

@@ -1,4 +1,10 @@
 <style lang="less">
+// 设置全局样式
+page{
+  font-size:28rpx;
+}
+// 导入字体图标
+@import url('assets/font/icon-font.wxss');
 </style>
 
 <script>
@@ -6,17 +12,42 @@ import wepy from 'wepy'
 
 export default class extends wepy.app {
   config = {
-    pages: ['pages/test', 'pages/index'],
+    pages: ['pages/index', 'pages/category', 'pages/cart', 'pages/profile', 'pages/goods_detail'],
     window: {
-      backgroundTextStyle: 'light',
-      navigationBarBackgroundColor: '#fff',
-      navigationBarTitleText: 'WeChat',
-      navigationBarTextStyle: 'black'
+      navigationBarTitleText: '品优购'
+    },
+    tabBar: {
+      list: [
+        {
+          pagePath: 'pages/index',
+          text: '首页',
+          iconPath: 'assets/tabs/icon_home@3x.png',
+          selectedIconPath: 'assets/tabs/icon_home_active@3x.png'
+        },
+        {
+          pagePath: 'pages/category',
+          text: '分类',
+          iconPath: 'assets/tabs/icon_category@3x.png',
+          selectedIconPath: 'assets/tabs/icon_category_active@3x.png'
+        },
+        {
+          pagePath: 'pages/cart',
+          text: '购物车',
+          iconPath: 'assets/tabs/icon_cart@3x.png',
+          selectedIconPath: 'assets/tabs/icon_cart_active@3x.png'
+        },
+        {
+          pagePath: 'pages/profile',
+          text: '我的',
+          iconPath: 'assets/tabs/icon_me@3x.png',
+          selectedIconPath: 'assets/tabs/icon_me_active@3x.png'
+        }
+      ]
     }
   };
 
-  onLaunch() {
-    console.log('on launch')
+  onLoad() {
+    console.log('onLoad')
   }
 }
 </script>

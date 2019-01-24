@@ -1,21 +1,218 @@
 <style lang="less">
-</style>
+.slide-image {
+  width: 750rpx;
+  height: 340rpx;
+}
 
-<template>
-  <view class="container">Hello world - 666</view>
+.nav {
+  display: flex;
+  background-color: #fff;
+
+  &-item {
+    display: flex;
+    flex: 1;
+    justify-content: center;
+    padding: 24rpx 0 29rpx 0;
+  }
+
+  &-img {
+    width: 128rpx;
+    height: 128rpx;
+  }
+}
+
+.floor {
+  &-head {
+    margin-top: 30rpx;
+    image {
+      width: 750rpx;
+      height: 59rpx;
+    }
+  }
+
+  &-body {
+    display: flex;
+    padding: 20rpx 16rpx;
+    background-color: #fff;
+
+    &-left,
+    &-left-img {
+      width: 232rpx;
+      height: 386rpx;
+    }
+
+    &-right {
+      display: flex;
+      flex-wrap: wrap;
+      height: 386rpx;
+      overflow: hidden;
+
+      &-img {
+        width: 233rpx;
+        height: 188rpx;
+        margin: 0 0 10rpx 10rpx;
+      }
+    }
+  }
+}
+
+.to-top {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: fixed;
+  right: 30rpx;
+  bottom: 90rpx;
+  width: 90rpx;
+  height: 90rpx;
+  background-color: rgba(255, 255, 255, 0.7);
+  border-radius: 50%;
+
+  &-img {
+    width: 24rpx;
+    height: 14rpx;
+  }
+  &-text {
+    margin-top: 5rpx;
+    color: #666;
+  }
+}
+
+.end-tips {
+  display: flex;
+  justify-content: center;
+  height: 200rpx;
+  padding-top: 30rpx;
+  box-sizing: border-box;
+  color: #999;
+}
+</style>
+<template lang="wxml" minapp="wepy">
+  <!-- 顶部轮播图 -->
+  <swiper
+    indicator-dots="{{indicatorDots}}"
+    indicator-active-color="{{indicatorActiveColor}}"
+    autoplay="{{autoplay}}"
+    interval="{{interval}}"
+    duration="{{duration}}"
+    circular="{{circular}}">
+    <block wx:for="{{imgUrls}}" wx:key="navigator_url">
+      <swiper-item>
+        <navigator url="{{item.navigator_url}}">
+        <image src="{{item.image_src}}" class="slide-image" width="355" height="150"/>
+        </navigator>
+      </swiper-item>
+    </block>
+  </swiper>
+
+  <!-- 导航 -->
+  <view class="nav">
+    <navigator wx:for="{{cateItems}}" wx:key="name" class="nav-item" hover-class="none" url="{{item.navigator_url}}" open-type="{{item.open_type}}">
+      <image src="{{item.image_src}}" class="nav-img" />
+    </navigator>
+
+  </view>
+
+  <!-- 楼层 -->
+  <view class="floor" wx:for="{{floorList}}" wx:key="index">
+    <view class="floor-head">
+      <image src="{{item.floor_title.image_src}}" />
+    </view>
+    <view class="floor-body">
+      <view class="floor-body-left">
+        <image class="floor-body-left-img" src="{{item.product_list[0].image_src}}"></image>
+      </view>
+      <view class="floor-body-right">
+        <navigator url="" wx:for="{{item.product_list}}" wx:key="name" wx:if="{{index !== 0}}">
+          <image style="width: {{item.image_width}}rpx" class="floor-body-right-img" src="{{item.image_src}}" />
+        </navigator>
+      </view>
+    </view>
+  </view>
+
+  <!-- 返回顶部 -->
+  <view class="to-top" hidden="{{isHideToTop}}" @tap="toTop">
+    <image src="/assets/tabs/arrow_top@2x.png" class="to-top-img"></image>
+    <text class="to-top-text">顶部</text>
+  </view>
+
+  <!-- 底线 -->
+  <view class="end-tips">
+    <view class="iconfont icon-xiao"></view>
+    <view class="end-tips-text">我是有底线的</view>
+  </view>
 </template>
 
 <script>
 import wepy from 'wepy'
-
+//
 export default class Index extends wepy.page {
   config = {
-    navigationBarTitleText: 'test'
+    navigationBarTitleText: '品优购',
+    navigationBarBackgroundColor: '#ff2d4a',
+    navigationBarTextStyle: 'white'
+  }
+  data = {
+    // 轮播图数据
+    imgUrls: [],
+    indicatorDots: true,
+    indicatorActiveColor: '#fff',
+    autoplay: true,
+    interval: 5000,
+    duration: 1000,
+    circular: true,
+    // 导航菜单列表数据
+    cateItems: [],
+    // 楼层数据
+    floorList: [],
+    // 控制返回顶部按钮的显示和隐藏
+    isHideToTop: true
   };
+  toTop() {
+    wepy.pageScrollTo({
+      scrollTop: 0,
+      duration: 300
+    })
+  };
+    // 监听页面滚动
+  onPageScroll(config) {
+    // console.log('页面滚动了', config)
+    if (config.scrollTop > 150) {
+      this.isHideToTop = false
+    } else {
+      this.isHideToTop = true
+    }
+    this.$apply()
+  }
 
-  // 实例方法:
   onLoad() {
     console.log('onLoad')
+    wepy.request({
+      url: 'http://127.0.0.1:8888/api/public/v1/home/swiperdata',
+      success: res => {
+        this.imgUrls = res.data.data
+        // console.log(this.imgUrls)
+        this.$apply()
+      }
+    })
+
+    wepy.request({
+      url: 'http://127.0.0.1:8888/api/public/v1/home/catitems',
+      success: res => {
+        // console.log(res)
+        this.cateItems = res.data.data
+        this.$apply()
+      }
+    })
+    wepy.request({
+      url: 'http://127.0.0.1:8888/api/public/v1/home/floordata',
+      success: res => {
+        console.log(res)
+        this.floorList = res.data.data
+        this.$apply()
+      }
+    })
   }
 }
 </script>
