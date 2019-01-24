@@ -187,12 +187,12 @@ export default class Index extends wepy.page {
   }
 
   onLoad() {
-    console.log('onLoad')
+    // console.log('onLoad')
     wepy.request({
       url: 'http://127.0.0.1:8888/api/public/v1/home/swiperdata',
       success: res => {
         this.imgUrls = res.data.data
-        // console.log(this.imgUrls)
+        console.log(this.imgUrls)
         this.$apply()
       }
     })

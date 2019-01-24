@@ -32,10 +32,10 @@
 			"current": 0,
 			"list": [
 				{
-					"id": -1,
+					"id": 0,
 					"name": "商品详情",
 					"pathName": "pages/goods_detail",
-					"query": "id=55578"
+					"query": "goods_id=50968"
 				}
 			]
 		}

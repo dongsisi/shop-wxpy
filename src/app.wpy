@@ -1,10 +1,12 @@
 <style lang="less">
 // 设置全局样式
 page{
-  font-size:28rpx;
+  font-size:24rpx;
 }
 // 导入字体图标
 @import url('assets/font/icon-font.wxss');
+// 导入wxParse样式
+@import url('vendor/wxParse/wxParse.wxss');
 </style>
 
 <script>
@@ -12,7 +14,7 @@ import wepy from 'wepy'
 
 export default class extends wepy.app {
   config = {
-    pages: ['pages/index', 'pages/category', 'pages/cart', 'pages/profile', 'pages/goods_detail'],
+    pages: ['pages/index', 'pages/goods_detail', 'pages/category', 'pages/cart', 'pages/profile'],
     window: {
       navigationBarTitleText: '品优购'
     },

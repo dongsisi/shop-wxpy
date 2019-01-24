@@ -234,19 +234,19 @@
 <template>
   <!-- 商品详情页 -->
   <swiper class="swiper" indicator-dots="{{ true }}" indicator-color="rgba(255,255,255,.5)" indicator-active-color="#ffffff" interval="2500" autoplay="true" circular="true">
-    <block>
+    <block wx:for="{{detail.pics}}" wx:key="pic_id">
       <swiper-item>
-        <image class="swiper-img" src="/assets/upload/detail_banner@2x.png" />
+        <image  src="{{item.pics_mid}}" class="swiper-img"/>
       </swiper-item>
     </block>
   </swiper>
   <view class="product-info">
     <view class="product-head">
-      <text class="price">￥ 1000</text>
+      <text class="price">￥ {{detail.goods_price}}</text>
     </view>
     <view class="product-body">
       <view class="product-name">
-        初羽2017秋装新款潮派女装加绒加厚加大钾肥买到赚到不买拉倒爱要不要
+        {{detail.goods_name}}
       </view>
       <view class="product-like">
         <view class="iconfont icon-shoucang"></view>
@@ -277,35 +277,27 @@
   <view class="tabs">
     <view class="tabs-head">
       <block>
-        <view class="tabs-item active">
+        <view class="tabs-item {{tabActive === '1' ? 'active' : ''}}" @tap="changeTab(1)">
           图文详情
         </view>
-        <view class="tabs-item">
+        <view class="tabs-item {{tabActive === '2' ? 'active' : ''}}" @tap="changeTab(2)">
           规格参数
         </view>
       </block>
     </view>
     <view class="tabs-body">
-      <view class="tabs-content introduce" style="display: none;">
-        商品图文展示
+      <!-- 图文内容 -->
+      <view class="tabs-content introduce" hidden="{{tabActive !== '1'}}">
+        <!-- 商品图文展示 -->
+        <import src="../vendor/wxParse/wxParse.wxml"></import>
+        <template is="wxParse" data="{{wxParseData:introduce.nodes}}"></template>
       </view>
-      <view class="tabs-content">
-        <block>
+      <!-- 规格参数内容 -->
+      <view class="tabs-content" hidden="{{tabActive !== '2'}}">
+        <block wx:for="{{detail.attrs}}" wx:key="attr_id">
           <view class="param-item">
-            <text class="note">商品名称</text>
-            <text class="description">复古装色运动外套男女情侣套装买一送医就是这么便宜</text>
-          </view>
-          <view class="param-item">
-            <text class="note">品牌</text>
-            <text class="description">初羽</text>
-          </view>
-          <view class="param-item">
-            <text class="note">编号</text>
-            <text class="description">8R1005</text>
-          </view>
-          <view class="param-item">
-            <text class="note">颜色</text>
-            <text class="description">黑色/白色/灰色</text>
+            <text class="note">{{item.attr_name}}</text>
+            <text class="description">{{item.attr_value || '无'}}</text>
           </view>
         </block>
       </view>
@@ -333,13 +325,47 @@
 
 <script>
 import wepy from 'wepy'
-
+// 导入weparse
+import wxParse from '../vendor/wxParse/wxParse.js'
 // 首字母大写
 export default class detail extends wepy.page {
   config = {
     navigationBarTitleText: '品优购',
     navigationBarBackgroundColor: '#ff2d4a',
     navigationBarTextStyle: 'white'
+  };
+  data = {
+    detail: {},
+    tabActive: '1'
+  };
+  methods={
+    // tab切换
+    changeTab(tabId) {
+      console.log(tabId)
+      this.tabActive = tabId
+    },
+    wxParseImgLoad() {}
+  };
+  onLoad(params) {
+    // console.log('商品id', params)
+    wepy.request({
+      url: 'http://localhost:8888/api/public/v1/goods/detail',
+      data: {
+        goods_id: params.goods_id
+      },
+      success: res => {
+        // console.log(res)
+        this.detail = res.data.data
+        this.$apply()
+        wxParse.wxParse(
+          'introduce',
+          'html',
+          this.detail.goods_introduce,
+          this,
+          5
+        )
+      }
+    })
   }
 }
 </script>
