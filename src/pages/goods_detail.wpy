@@ -268,7 +268,7 @@
   <view class="part">
     <!-- <Address> -->
     <view class="part-item">
-      <text class="note">送至</text><text class="description">上海市浦东新区航头镇航都路18号黑马程序员</text>
+      <text class="note">送至</text><text class="description" @tap="chooseAddress">{{ address }}</text>
       <view class="iconfont icon-jiantouyou"></view>
     </view>
     <!-- </Address> -->
@@ -317,7 +317,7 @@
       <text class="item-note">购物车</text>
     </view>
     <view class="btn-group">
-      <view class="btn yellow-button">加入购物车</view>
+      <view class="btn yellow-button" @tap="addCart">加入购物车</view>
       <view class="btn red-button">立即购买</view>
     </view>
   </view>
@@ -336,7 +336,8 @@ export default class detail extends wepy.page {
   };
   data = {
     detail: {},
-    tabActive: '1'
+    tabActive: '1',
+    address: '请选择：'
   };
   methods={
     // tab切换
@@ -344,7 +345,56 @@ export default class detail extends wepy.page {
       console.log(tabId)
       this.tabActive = tabId
     },
-    wxParseImgLoad() {}
+    wxParseImgLoad() {},
+    // 调用收货地址
+    chooseAddress() {
+      // console.log('chooseAddress')
+      wepy.chooseAddress({
+        success: ({provinceName, cityName, countyName, detailInfo}) => {
+          // console.log(res)
+          this.address = provinceName + cityName + countyName + detailInfo
+          this.$apply()
+        }
+      })
+    },
+    // 将商品加入购物车
+    // 将购物车数据存储到本地缓存中，数据格式是？[{},{},{}]
+    // 添加购物车的逻辑：
+    // 1.从本地缓存中取出已有的购物车数据
+    // 2.判段购物车数据中是否包含当前商品
+    // 3.如果包含，需要让当前商品数量+1即可
+    // 4.如果不包含，就将该商品对象添加到购物车数据中
+    // 5.将修改后的数据存储到本地缓存中
+    addCart() {
+       /*eslint-disable */
+      const {
+        goods_id,
+        goods_small_logo,
+        goods_name,
+        goods_price
+      } = this.detail;
+      // console.log('addCart')
+      // 1.从本地缓存中取出购物车数据
+      const cart = wepy.getStorageSync('goods_cart') || []
+      // 2.判段购物车数据中是否包含当前商品find遍历
+      /*eslint-disable */
+      const curGoods = cart.find(item => item.goods_id === goods_id)
+      if(typeof curGoods ==='undefined'){ //没有包含
+        cart.push({goods_id,goods_small_logo,goods_name,goods_price,goods_number:1})
+      }else{ //有数据
+        curGoods.goods_number += 1
+      }
+      //5.修改后的数据存到本地存储中
+      wepy.setStorageSync('goods_cart',cart)
+      // 添加成功提示
+      wepy.showToast({
+        title:'加入购物车',
+        icon:'success',
+        duration:800,
+        // 开启一个遮罩层,防止连续点击
+        mask:true
+      });
+    }
   };
   onLoad(params) {
     // console.log('商品id', params)
